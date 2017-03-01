@@ -23,13 +23,16 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -65,17 +68,17 @@ public class Main2Activity extends AppCompatActivity
     private TextView mOutputText;
     private Button mCallApiButton;
     ProgressDialog mProgress;
+//    private MyAccessibilityService aService;
     private com.google.api.services.gmail.Gmail mService = null;
     private Exception mLastError = null;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-
+    private Boolean mBound = false;
     private static final String BUTTON_TEXT = "Call Gmail API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { GmailScopes.MAIL_GOOGLE_COM,GmailScopes.GMAIL_READONLY,GmailScopes.GMAIL_MODIFY };
-
     /**
      * Create the main activity.
      * @param savedInstanceState previously saved instance data.
@@ -129,7 +132,23 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        // Bind to the service
+//        bindService(new Intent(this, MyAccessibilityService.class), mConnection,
+//                Context.BIND_AUTO_CREATE);
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        // Unbind from the service
+//        if (mBound) {
+//            unbindService(mConnection);
+//            mBound = false;
+//        }
+//    }
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an
@@ -432,7 +451,7 @@ public class Main2Activity extends AppCompatActivity
                             Main2Activity.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
+                            + mLastError.getCause());
                 }
             } else {
                 mOutputText.setText("Request cancelled.");
@@ -536,7 +555,7 @@ public class Main2Activity extends AppCompatActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             Main2Activity.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText("The following error occurred:\n"
+                    mOutputText.setText("The following error occurred test:\n"
                             + mLastError.getMessage());
                 }
             } else {
@@ -544,4 +563,26 @@ public class Main2Activity extends AppCompatActivity
             }
         }
     }
+
+    public void postConnect() {
+        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+    }
+
+//    private ServiceConnection mConnection = new ServiceConnection() {
+//
+//        @Override
+//        public void onServiceConnected(ComponentName className,
+//                                       IBinder service) {
+//            // We've bound to LocalService, cast the IBinder and get LocalService instance
+//            MyAccessibilityService.MyAccessibilityServiceBinder binder = (MyAccessibilityService.MyAccessibilityServiceBinder) service;
+//            aService = binder.getService();
+//            mBound = true;
+//            postConnect();
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName arg0) {
+//            mBound = false;
+//        }
+//    };
 }

@@ -1,11 +1,9 @@
 package com.sujityadav.bubbletest;
 
-import android.app.ActivityManager;
 import android.app.Service;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,11 +13,25 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.List;
 
 public class FloatingViewService extends Service {
     private WindowManager mWindowManager;
     private View mFloatingView;
+    private String date;
+    private String subject;
+    private String merchant;
+    private Bundle bundle;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        bundle = intent.getExtras();
+        date = bundle.getString("date");
+        subject = bundle.getString("subject");
+        merchant = bundle.getString("merchant");
+        Toast.makeText(this, date+"\n"+subject+"\n"+merchant, Toast.LENGTH_SHORT).show();
+        return START_NOT_STICKY;
+    }
+
     public FloatingViewService() {
     }
 
@@ -28,6 +40,7 @@ public class FloatingViewService extends Service {
         // TODO: Return the communication channel to the service.
         return null;
     }
+
 
     @Override
     public void onCreate() {
@@ -92,9 +105,14 @@ public class FloatingViewService extends Service {
                         //So that is click event.
                         if (Xdiff < 10 && Ydiff < 10) {
                             //Open the application  click.
-                            Intent intent = new Intent(FloatingViewService.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+//                            Intent intent = new Intent(FloatingViewService.this, Main2Activity.class);
+//                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(intent);
+                            Intent intent = new Intent();
+                            intent.setAction("com.sujityadav.bubbletest.NOTIFY");
+                            intent.putExtra("merchant", merchant);
+                            sendBroadcast(intent);
+                            Toast.makeText(FloatingViewService.this, "Broadcast Sent", Toast.LENGTH_SHORT).show();
 
 
                             //close the service and remove view from the view hierarchy
